@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VPN Vika | Только Telegram username</title>
+  <title>VPN Oli | Только Telegram username</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -275,10 +275,10 @@
   <div class="form-card">
     <div class="brand">
       <div class="brand-icon">
-        <span>V</span>
+        <span>O</span>
       </div>
       <div class="brand-text">
-        <h2>VPN Vika·</h2>
+        <h2>VPN Oli·</h2>
       </div>
     </div>
 
@@ -301,31 +301,20 @@
     <div id="statusMessage" class="status-message hidden"></div>
 
     <details class="telegram-note">
-      <summary>как настроить отправку в Telegram бота</summary>
+      <summary>как настроить VPN </summary>
       <p>
-        ⚙️ Для реальной отправки замените <code>telegramEndpoint</code> в JavaScript на URL вашего серверного обработчика (например, <code>/telegram-send.php</code>).<br><br>
-        💡 Пример PHP скрипта (разместите на сервере):
-      </p>
-      <pre style="background: #dbeefb; padding: 0.8rem; border-radius: 1.2rem; overflow-x: auto; font-size: 0.8rem; color: #02577a;"><code>&lt;?php
-$token = 'ВАШ_ТОКЕН_БОТА';
-$chat_id = 'ВАШ_CHAT_ID';
-$telegram = $_POST['telegram'] ?? '';
-$text = "✉️ Новая заявка:\nTelegram: $telegram";
-file_get_contents("https://api.telegram.org/bot$token/sendMessage?chat_id=$chat_id&text=".urlencode($text));
-echo 'OK';
-?&gt;</code></pre>
-      <p style="margin-top: 0.5rem;">🔒 Никогда не храните токен бота в клиентском коде. Используйте сервер-посредник.</p>
-    </details>
-  </div>
+        ⚙️ Скачайте приложение WireGuard на свое устройство, следуйте инструкции менеджера. 
 
+
+ 
   <div style="position: fixed; bottom: 10px; right: 20px; background: rgba(255,255,255,0.4); backdrop-filter: blur(5px); padding: 0.4rem 1rem; border-radius: 40px; color: #1e5779; font-size: 0.8rem; border: 1px solid white;">
-    ✦ Vika design · только Telegram ✦
+    ✦ Oli design · только Telegram ✦
   </div>
 
   <script>
     (function() {
-      const TELEGRAM_ENDPOINT = '/send-to-telegram';  // замените на реальный endpoint
-      const DEMO_MODE = true; // true для тестирования без сервера
+      const TELEGRAM_ENDPOINT = '/telegram-send.php'; 
+      const DEMO_MODE = false; //
 
       const form = document.getElementById('feedbackForm');
       const submitBtn = document.getElementById('submitBtn');

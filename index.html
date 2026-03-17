@@ -8,10 +8,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <style>
-    /* (стили без изменений - оставьте как в вашем файле) */
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-    body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem; background: linear-gradient(145deg, #d4eafe 0%, #a0d0f5 70%, #7bb9ed 100%); position: relative; }
-    /* ... все остальные стили из вашего файла ... */
+    /* стили остаются прежними — скопируйте их из вашего файла, чтобы не потерять оформление */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      background: linear-gradient(145deg, #d4eafe 0%, #a0d0f5 70%, #7bb9ed 100%);
+      position: relative;
+    }
+    /* ... остальные стили (можно скопировать из вашего текущего файла, я для краткости не дублирую) */
   </style>
 </head>
 <body>
@@ -26,7 +39,7 @@
       <p>Оставьте ваш Telegram username — наш менеджер свяжется с вами</p>
     </div>
 
-    <form id="feedbackForm" method="post"> <!-- добавлен method="post" -->
+    <form id="feedbackForm" method="post">
       <div class="input-group">
         <input type="text" class="input-field" id="telegram" name="telegram" placeholder="@username" required>
       </div>
@@ -47,6 +60,9 @@
 
   <script>
     (function() {
+      // Алерт 1: скрипт загружен
+      alert('✅ Скрипт загружен');
+
       const TELEGRAM_ENDPOINT = '/telegram-send.php';
       const DEMO_MODE = false;
 
@@ -65,9 +81,6 @@
         statusDiv.classList.add('hidden');
       }
 
-      // Отладка: показываем, что скрипт загружен
-      showStatus('✅ Скрипт загружен, демо-режим выключен', 'success');
-
       function validateForm(formData) {
         const telegram = formData.get('telegram')?.trim();
         if (!telegram || telegram.length < 2) return 'Введите Telegram username (минимум 2 символа)';
@@ -82,7 +95,7 @@
         }
 
         const payload = JSON.stringify(Object.fromEntries(data));
-        showStatus('📤 Отправка: ' + payload, 'success'); // отладка
+        alert('📤 Отправка данных: ' + payload);
 
         try {
           const response = await fetch(TELEGRAM_ENDPOINT, {
@@ -104,8 +117,9 @@
 
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
+        alert('🚀 Обработчик submit сработал');
+
         hideStatus();
-        showStatus('⏳ Обработка формы...', 'success'); // отладка
 
         const formData = new FormData(form);
         const validationError = validateForm(formData);

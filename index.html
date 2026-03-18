@@ -4,17 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VPN Oli | Только Telegram username</title>
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <style>
-    /* стили остаются прежними — скопируйте их из вашего файла, чтобы не потерять оформление */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       font-family: 'Inter', sans-serif;
     }
+
     body {
       min-height: 100vh;
       display: flex;
@@ -24,35 +25,297 @@
       background: linear-gradient(145deg, #d4eafe 0%, #a0d0f5 70%, #7bb9ed 100%);
       position: relative;
     }
-    /* ... остальные стили (можно скопировать из вашего текущего файла, я для краткости не дублирую) */
+
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: 
+        radial-gradient(circle at 30% 40%, rgba(255,255,255,0.2) 0%, transparent 20%),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.15) 0%, transparent 25%),
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 2px, transparent 2px, transparent 10px);
+      pointer-events: none;
+    }
+
+    .form-card {
+      position: relative;
+      max-width: 480px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 2.5rem;
+      padding: 2.5rem 2.2rem;
+      box-shadow: 0 30px 50px -15px rgba(0, 80, 120, 0.4),
+                  0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+      transition: transform 0.3s ease;
+    }
+
+    .form-card:hover {
+      transform: translateY(-6px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 2rem;
+    }
+
+    .brand-icon {
+      background: linear-gradient(135deg, #2a7faa, #4ba9d6);
+      width: 48px;
+      height: 48px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 15px -8px rgba(0,110,150,0.4);
+    }
+
+    .brand-icon span {
+      color: white;
+      font-weight: 600;
+      font-size: 1.8rem;
+      line-height: 1;
+      transform: rotate(-2deg);
+      filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.1));
+    }
+
+    /* Стили для h2 (VPN Oli) и h6 (приватность) — делаем их голубыми */
+    .brand h2 {
+      color: #0b3954; /* тёмно-голубой, как в заголовке формы */
+      font-size: 1.9rem;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      margin: 0;
+    }
+
+    .brand-text h6 {
+      color: #2b5f7a; /* более светлый голубой, как подзаголовок */
+      font-size: 0.95rem;
+      font-weight: 400;
+      line-height: 1.4;
+      margin-top: 2px;
+    }
+
+    .brand-text p {
+      color: #2b5f7a;
+      font-size: 0.95rem;
+      font-weight: 400;
+      margin-top: 2px;
+    }
+
+    .form-title {
+      margin-bottom: 1.8rem;
+    }
+
+    .form-title h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #0b3954;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .form-title p {
+      color: #3b6d8c;
+      font-size: 0.95rem;
+      margin-top: 0.3rem;
+      font-weight: 400;
+    }
+
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 0.9rem 1.2rem;
+      background-color: rgba(255, 255, 255, 0.7);
+      border: 1.5px solid rgba(70, 150, 200, 0.3);
+      border-radius: 1.8rem;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.25s ease;
+      color: #064663;
+      font-weight: 500;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 4px 6px -4px rgba(0,120,180,0.1);
+    }
+
+    .input-field:focus {
+      border-color: #3498db;
+      background-color: #ffffff;
+      box-shadow: 0 8px 20px -10px #2a9df4, 0 0 0 3px rgba(52,152,219,0.2);
+    }
+
+    .input-field::placeholder {
+      color: #5f8daa;
+      font-weight: 400;
+      opacity: 0.7;
+    }
+
+    .submit-btn {
+      background: linear-gradient(115deg, #2887c4, #45a7e6);
+      border: none;
+      padding: 1rem 1.8rem;
+      width: 100%;
+      border-radius: 3rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 15px 25px -8px #1f6ca0, 0 2px 0 0 #c5e6ff inset;
+      transition: all 0.2s ease;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .submit-btn:hover {
+      background: linear-gradient(115deg, #1f78b0, #3598d4);
+      box-shadow: 0 20px 30px -8px #145d8a;
+      transform: scale(1.02);
+    }
+
+    .submit-btn:active {
+      transform: scale(0.98);
+      box-shadow: 0 8px 15px -5px #145d8a;
+    }
+
+    .status-message {
+      margin-top: 1.5rem;
+      padding: 0.8rem 1.2rem;
+      border-radius: 3rem;
+      font-weight: 500;
+      text-align: center;
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(4px);
+      color: #0b485f;
+      font-size: 0.95rem;
+      border: 1px solid rgba(255,255,255,0.8);
+      transition: opacity 0.3s;
+    }
+
+    .status-message.success {
+      background: rgba(185, 230, 255, 0.8);
+      color: #02577a;
+      border-color: #a2d8ff;
+    }
+
+    .status-message.error {
+      background: rgba(255, 220, 220, 0.75);
+      color: #a43a3a;
+      border-color: #ffbaba;
+    }
+
+    .status-message.hidden {
+      opacity: 0;
+      visibility: hidden;
+      padding: 0;
+      margin: 0;
+      height: 0;
+    }
+
+    .telegram-note {
+      margin-top: 2rem;
+      padding: 1rem 1.3rem;
+      background: rgba(215, 237, 255, 0.7);
+      backdrop-filter: blur(4px);
+      border-radius: 2rem;
+      font-size: 0.9rem;
+      color: #1b4f6e;
+      border: 1px solid white;
+    }
+
+    .telegram-note summary {
+      font-weight: 600;
+      cursor: pointer;
+      color: #0c4c77;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .telegram-note summary::before {
+      content: '📬';
+      font-size: 1.1rem;
+    }
+
+    .telegram-note code {
+      background: #e3f0fc;
+      padding: 0.2rem 0.5rem;
+      border-radius: 30px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: #105d8f;
+      border: 1px solid #a6cef0;
+      display: inline-block;
+      margin: 4px 0;
+    }
+
+    .telegram-note p {
+      margin-top: 0.7rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 480px) {
+      .form-card {
+        padding: 1.8rem 1.5rem;
+        border-radius: 2rem;
+      }
+      .brand h2 {
+        font-size: 1.5rem;
+      }
+      .form-title h1 {
+        font-size: 1.7rem;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="form-card">
     <div class="brand">
-      <div class="brand-icon"><span>O</span></div>
-      <div class="brand-text"><h2>VPN Oli·</h2></div>
+      <div class="brand-icon">
+        <span>O</span>
+      </div>
+      <h2>VPN Oli·</h2>
+      <div class="brand-text">
+        <h6>Частная, приватная, сеть. <br>Не собираем ваши данные, не храним логи ваших действий.</h6>
+      </div>
     </div>
 
     <div class="form-title">
       <h1>Обратная связь</h1>
-      <p>Оставьте ваш Telegram username — наш менеджер свяжется с вами</p>
+      <p>Оставьте ваш Telegram username, наш менеджер свяжется с вами</p>
     </div>
 
-    <form id="feedbackForm" method="post">
+    <!-- Форма с одним полем: telegram username -->
+    <form id="feedbackForm">
       <div class="input-group">
         <input type="text" class="input-field" id="telegram" name="telegram" placeholder="@username" required>
       </div>
-      <button type="submit" class="submit-btn" id="submitBtn"><span>✈️</span> Отправить</button>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <span>✈️</span> Отправить
+      </button>
     </form>
 
     <div id="statusMessage" class="status-message hidden"></div>
 
     <details class="telegram-note">
       <summary>как настроить VPN</summary>
-      <p>⚙️ Скачайте приложение WireGuard на свое устройство, следуйте инструкции менеджера.</p>
+      <p>
+        ⚙️ Скачайте приложение WireGuard на свое устройство, следуйте инструкции менеджера.
+      </p>
     </details>
 
+    <!-- Окошко вынесено за пределы блока "как настроить VPN" (уже было выполнено ранее) -->
     <div style="position: fixed; bottom: 10px; right: 20px; background: rgba(255,255,255,0.4); backdrop-filter: blur(5px); padding: 0.4rem 1rem; border-radius: 40px; color: #1e5779; font-size: 0.8rem; border: 1px solid white;">
       ✦ Oli design · только Telegram ✦
     </div>
@@ -60,11 +323,8 @@
 
   <script>
     (function() {
-      // Алерт 1: скрипт загружен
-      alert('✅ Скрипт загружен');
-
       const TELEGRAM_ENDPOINT = '/telegram-send.php';
-      const DEMO_MODE = false;
+      const DEMO_MODE = false; //
 
       const form = document.getElementById('feedbackForm');
       const submitBtn = document.getElementById('submitBtn');
@@ -81,10 +341,16 @@
         statusDiv.classList.add('hidden');
       }
 
+      // Валидация только для поля telegram
       function validateForm(formData) {
         const telegram = formData.get('telegram')?.trim();
-        if (!telegram || telegram.length < 2) return 'Введите Telegram username (минимум 2 символа)';
-        if (telegram.includes(' ')) return 'Username не должен содержать пробелы';
+        if (!telegram || telegram.length < 2) {
+          return 'Введите Telegram username (минимум 2 символа)';
+        }
+        // Можно добавить простую проверку: не должен содержать пробелы, хотя бы @ или начинаться с буквы/цифры
+        if (telegram.includes(' ')) {
+          return 'Username не должен содержать пробелы';
+        }
         return null;
       }
 
@@ -94,14 +360,11 @@
           return { ok: true, demo: true };
         }
 
-        const payload = JSON.stringify(Object.fromEntries(data));
-        alert('📤 Отправка данных: ' + payload);
-
         try {
           const response = await fetch(TELEGRAM_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: payload,
+            body: JSON.stringify(Object.fromEntries(data)),
           });
 
           if (!response.ok) {
@@ -117,8 +380,6 @@
 
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        alert('🚀 Обработчик submit сработал');
-
         hideStatus();
 
         const formData = new FormData(form);
@@ -154,6 +415,7 @@
         }
       });
 
+      // Очищать статус при фокусе на поле
       document.getElementById('telegram').addEventListener('focus', hideStatus);
     })();
   </script>

@@ -323,9 +323,8 @@
 
   <script>
     (function() {
-      // --- НОВЫЕ ДАННЫЕ TELEGRAM (ваши) ---
-      const TELEGRAM_BOT_TOKEN = '8533228452:AAFlM8IBlM2srg4xiidvkHB-YlGtlu7pnIc';
-      const TELEGRAM_CHAT_ID = '7058053367';
+      // ⚠️ Адрес вашего сервера (замените на реальный IP или домен)
+      const API_URL = 'http://107.189.25.43:3000/send-message'; // ← ВАШ IP
 
       const form = document.getElementById('feedbackForm');
       const submitBtn = document.getElementById('submitBtn');
@@ -343,7 +342,6 @@
         statusDiv.classList.add('hidden');
       }
 
-      // Валидация: не пусто, минимум 2 символа, без пробелов
       function validateUsername(username) {
         const trimmed = username.trim();
         if (!trimmed || trimmed.length < 2) {
@@ -355,25 +353,18 @@
         return null;
       }
 
-      // Отправка сообщения в Telegram через API
-      async function sendToTelegram(username) {
-        const text = `📬 Новая заявка с сайта VPN Oli\n\n👤 Username: ${username}`;
-        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-
+      // Отправка username на ваш сервер
+      async function sendToServer(username) {
         try {
-          const response = await fetch(url, {
+          const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id: TELEGRAM_CHAT_ID,
-              text: text,
-              parse_mode: 'HTML' // опционально
-            })
+            body: JSON.stringify({ username })
           });
 
-          const data = await response.json();
-          if (!data.ok) {
-            throw new Error(data.description || 'Ошибка Telegram API');
+          const text = await response.text();
+          if (!response.ok) {
+            throw new Error(text || 'Ошибка сервера');
           }
           return { ok: true };
         } catch (error) {
@@ -398,7 +389,7 @@
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = '⏳ Отправка...';
 
-        const result = await sendToTelegram(username);
+        const result = await sendToServer(username);
 
         if (result.ok) {
           showStatus('✅ Спасибо! Ваш username отправлен. Мы свяжемся с вами в Telegram.', 'success');
@@ -412,7 +403,6 @@
         submitBtn.innerHTML = originalText;
       });
 
-      // Скрываем статус при фокусе на поле
       telegramInput.addEventListener('focus', hideStatus);
     })();
   </script>

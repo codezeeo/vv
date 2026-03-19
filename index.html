@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <style>
+    /* Стили без изменений (полностью из вашего исходника) */
     * {
       margin: 0;
       padding: 0;
@@ -82,9 +83,8 @@
       filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.1));
     }
 
-    /* Стили для h2 (VPN Oli) и h6 (приватность) — делаем их голубыми */
     .brand h2 {
-      color: #0b3954; /* тёмно-голубой, как в заголовке формы */
+      color: #0b3954;
       font-size: 1.9rem;
       font-weight: 600;
       letter-spacing: -0.5px;
@@ -92,7 +92,7 @@
     }
 
     .brand-text h6 {
-      color: #2b5f7a; /* более светлый голубой, как подзаголовок */
+      color: #2b5f7a;
       font-size: 0.95rem;
       font-weight: 400;
       line-height: 1.4;
@@ -315,7 +315,7 @@
       </p>
     </details>
 
-    <!-- Окошко вынесено за пределы блока "как настроить VPN" (уже было выполнено ранее) -->
+    <!-- Окошко дизайна (оставлено как есть) -->
     <div style="position: fixed; bottom: 10px; right: 20px; background: rgba(255,255,255,0.4); backdrop-filter: blur(5px); padding: 0.4rem 1rem; border-radius: 40px; color: #1e5779; font-size: 0.8rem; border: 1px solid white;">
       ✦ Oli design · только Telegram ✦
     </div>
@@ -323,12 +323,14 @@
 
   <script>
     (function() {
-      const TELEGRAM_ENDPOINT = '/telegram-send.php';
-      const DEMO_MODE = false; //
+      // --- НОВЫЕ ДАННЫЕ TELEGRAM (ваши) ---
+      const TELEGRAM_BOT_TOKEN = '8533228452:AAFlM8IBlM2srg4xiidvkHB-YlGtlu7pnIc';
+      const TELEGRAM_CHAT_ID = '7058053367';
 
       const form = document.getElementById('feedbackForm');
       const submitBtn = document.getElementById('submitBtn');
       const statusDiv = document.getElementById('statusMessage');
+      const telegramInput = document.getElementById('telegram');
 
       function showStatus(text, type) {
         statusDiv.textContent = text;
@@ -341,35 +343,37 @@
         statusDiv.classList.add('hidden');
       }
 
-      // Валидация только для поля telegram
-      function validateForm(formData) {
-        const telegram = formData.get('telegram')?.trim();
-        if (!telegram || telegram.length < 2) {
+      // Валидация: не пусто, минимум 2 символа, без пробелов
+      function validateUsername(username) {
+        const trimmed = username.trim();
+        if (!trimmed || trimmed.length < 2) {
           return 'Введите Telegram username (минимум 2 символа)';
         }
-        // Можно добавить простую проверку: не должен содержать пробелы, хотя бы @ или начинаться с буквы/цифры
-        if (telegram.includes(' ')) {
+        if (trimmed.includes(' ')) {
           return 'Username не должен содержать пробелы';
         }
         return null;
       }
 
-      async function sendToTelegram(data) {
-        if (DEMO_MODE) {
-          console.log('DEMO MODE: данные не отправлены. Было бы отправлено:', Object.fromEntries(data));
-          return { ok: true, demo: true };
-        }
+      // Отправка сообщения в Telegram через API
+      async function sendToTelegram(username) {
+        const text = `📬 Новая заявка с сайта VPN Oli\n\n👤 Username: ${username}`;
+        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
         try {
-          const response = await fetch(TELEGRAM_ENDPOINT, {
+          const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(Object.fromEntries(data)),
+            body: JSON.stringify({
+              chat_id: TELEGRAM_CHAT_ID,
+              text: text,
+              parse_mode: 'HTML' // опционально
+            })
           });
 
-          if (!response.ok) {
-            const errText = await response.text();
-            throw new Error(`Сервер вернул ошибку: ${response.status} — ${errText}`);
+          const data = await response.json();
+          if (!data.ok) {
+            throw new Error(data.description || 'Ошибка Telegram API');
           }
           return { ok: true };
         } catch (error) {
@@ -382,8 +386,8 @@
         e.preventDefault();
         hideStatus();
 
-        const formData = new FormData(form);
-        const validationError = validateForm(formData);
+        const username = telegramInput.value.trim();
+        const validationError = validateUsername(username);
         if (validationError) {
           showStatus(validationError, 'error');
           return;
@@ -394,29 +398,22 @@
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = '⏳ Отправка...';
 
-        try {
-          const result = await sendToTelegram(formData);
-          if (result.ok) {
-            if (result.demo) {
-              showStatus('✅ [ДЕМО] Заявка принята! (настройте endpoint для реальной отправки в Telegram)', 'success');
-            } else {
-              showStatus('✅ Спасибо! Ваш username отправлен в Telegram', 'success');
-            }
-            form.reset();
-          } else {
-            showStatus(`❌ Ошибка: ${result.error || 'неизвестная ошибка'}`, 'error');
-          }
-        } catch (err) {
-          showStatus('❌ Критическая ошибка при отправке', 'error');
-        } finally {
-          submitBtn.disabled = false;
-          submitBtn.style.opacity = '1';
-          submitBtn.innerHTML = originalText;
+        const result = await sendToTelegram(username);
+
+        if (result.ok) {
+          showStatus('✅ Спасибо! Ваш username отправлен. Мы свяжемся с вами в Telegram.', 'success');
+          form.reset();
+        } else {
+          showStatus(`❌ Ошибка: ${result.error || 'не удалось отправить'}`, 'error');
         }
+
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+        submitBtn.innerHTML = originalText;
       });
 
-      // Очищать статус при фокусе на поле
-      document.getElementById('telegram').addEventListener('focus', hideStatus);
+      // Скрываем статус при фокусе на поле
+      telegramInput.addEventListener('focus', hideStatus);
     })();
   </script>
 </body>

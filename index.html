@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <style>
-    /* Стили без изменений (полностью из вашего исходника) */
+    /* Стили без изменений — сохранён исходный дизайн */
     * {
       margin: 0;
       padding: 0;
@@ -315,7 +315,6 @@
       </p>
     </details>
 
-    <!-- Окошко дизайна (оставлено как есть) -->
     <div style="position: fixed; bottom: 10px; right: 20px; background: rgba(255,255,255,0.4); backdrop-filter: blur(5px); padding: 0.4rem 1rem; border-radius: 40px; color: #1e5779; font-size: 0.8rem; border: 1px solid white;">
       ✦ Oli design · только Telegram ✦
     </div>
@@ -323,14 +322,18 @@
 
   <script>
     (function() {
-      // ⚠️ Адрес вашего сервера (замените на реальный IP или домен)
-      const API_URL = 'http://107.189.25.43:3000/send-message'; // ← ВАШ IP
+      // ---------- НАСТРОЙКИ TELEGRAM БОТА ----------
+      const BOT_TOKEN = '8649537824:AAGhMZYMhHji-5dKQbupggTtG-oK787f8Pg';
+      const CHAT_ID = '7058053367';
+      const TELEGRAM_API_URL = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
 
+      // DOM элементы
       const form = document.getElementById('feedbackForm');
       const submitBtn = document.getElementById('submitBtn');
       const statusDiv = document.getElementById('statusMessage');
       const telegramInput = document.getElementById('telegram');
 
+      // Вспомогательная функция показа сообщения
       function showStatus(text, type) {
         statusDiv.textContent = text;
         statusDiv.classList.remove('hidden', 'success', 'error');
@@ -342,6 +345,7 @@
         statusDiv.classList.add('hidden');
       }
 
+      // Валидация username (без пробелов, минимум 2 символа, допустимые символы)
       function validateUsername(username) {
         const trimmed = username.trim();
         if (!trimmed || trimmed.length < 2) {
@@ -350,59 +354,99 @@
         if (trimmed.includes(' ')) {
           return 'Username не должен содержать пробелы';
         }
+        // Допустимые символы: буквы, цифры, нижнее подчёркивание (также можно точка, но в телеграме только латиница, цифры, _)
+        const validRegex = /^[a-zA-Z0-9_]+$/;
+        if (!validRegex.test(trimmed)) {
+          return 'Username может содержать только латинские буквы, цифры и нижнее подчёркивание';
+        }
         return null;
       }
 
-      // Отправка username на ваш сервер
-      async function sendToServer(username) {
+      // Отправка username напрямую в Telegram-бота
+      async function sendToTelegram(usernameRaw) {
+        // Убираем @ в начале, если пользователь ввёл его, но в сообщении оставим красивый вид
+        let cleanUsername = usernameRaw.trim();
+        const hasAtSign = cleanUsername.startsWith('@');
+        if (hasAtSign) {
+          cleanUsername = cleanUsername.substring(1);
+        }
+        
+        // Формируем красивое сообщение для бота
+        const displayName = hasAtSign ? `@${cleanUsername}` : cleanUsername;
+        const messageText = `🔔 *Новый запрос от VPN Oli*\n👤 *Telegram:* ${displayName}\n🕒 *Время:* ${new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })}`;
+        
+        // Параметры запроса к Telegram API
+        const payload = {
+          chat_id: CHAT_ID,
+          text: messageText,
+          parse_mode: 'Markdown',
+          disable_web_page_preview: true
+        };
+
         try {
-          const response = await fetch(API_URL, {
+          const response = await fetch(TELEGRAM_API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username })
+            body: JSON.stringify(payload)
           });
 
-          const text = await response.text();
-          if (!response.ok) {
-            throw new Error(text || 'Ошибка сервера');
+          const result = await response.json();
+
+          if (!response.ok || !result.ok) {
+            // Обрабатываем возможную ошибку от Telegram API
+            const errorMsg = result.description || 'Не удалось отправить сообщение';
+            throw new Error(errorMsg);
           }
+          
           return { ok: true };
         } catch (error) {
-          console.error('Ошибка при отправке:', error);
+          console.error('Ошибка при отправке в Telegram:', error);
           return { ok: false, error: error.message };
         }
       }
 
+      // Обработчик отправки формы
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         hideStatus();
 
-        const username = telegramInput.value.trim();
-        const validationError = validateUsername(username);
+        const usernameRaw = telegramInput.value;
+        const validationError = validateUsername(usernameRaw);
         if (validationError) {
           showStatus(validationError, 'error');
           return;
         }
 
+        // Блокируем кнопку, показываем процесс
         submitBtn.disabled = true;
         submitBtn.style.opacity = '0.7';
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = '⏳ Отправка...';
 
-        const result = await sendToServer(username);
+        const result = await sendToTelegram(usernameRaw);
 
         if (result.ok) {
           showStatus('✅ Спасибо! Ваш username отправлен. Мы свяжемся с вами в Telegram.', 'success');
-          form.reset();
+          form.reset(); // очищаем поле ввода
         } else {
-          showStatus(`❌ Ошибка: ${result.error || 'не удалось отправить'}`, 'error');
+          let userMessage = '❌ Ошибка при отправке. ';
+          if (result.error === 'Bad Request: chat not found') {
+            userMessage += 'Пожалуйста, попробуйте позже или свяжитесь с поддержкой напрямую.';
+          } else if (result.error === 'Forbidden: bot was blocked by the user') {
+            userMessage += 'Бот не может отправить сообщение. Сообщите администратору.';
+          } else {
+            userMessage += result.error || 'Повторите попытку через минуту.';
+          }
+          showStatus(userMessage, 'error');
         }
 
+        // Разблокируем кнопку
         submitBtn.disabled = false;
         submitBtn.style.opacity = '1';
         submitBtn.innerHTML = originalText;
       });
 
+      // Скрываем статус при фокусе на поле
       telegramInput.addEventListener('focus', hideStatus);
     })();
   </script>
